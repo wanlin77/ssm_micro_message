@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wl.dao.IMessage">
+
+  <resultMap type="com.wl.domain.Message" id="MessageResult">
+    <id column="id" jdbcType="INTEGER" property="id"/>
+    <result column="command" jdbcType="VARCHAR" property="command"/>
+    <result column="description" jdbcType="VARCHAR" property="description"/>
+    <result column="content" jdbcType="VARCHAR" property="content"/>
+  </resultMap>
+
+  <select id="queryMessageList" parameterType="com.wl.domain.Message" resultMap="MessageResult">
+   	select id,command,description,content from message where 1 = 1
+   	<if test="command != null and !&quot;&quot;.equals(command.trim())">
+   		and command = #{command,jdbcType=VARCHAR}
+   	</if>
+   	<if test="description != null and !&quot;&quot;.equals(description.trim())">
+   		and description like "%" #{description,jdbcType=VARCHAR} "%"
+   	</if>
+  </select>
+  
+  <select id="queryById" parameterType="java.lang.Integer" resultMap="MessageResult">
+  	select id,command,description,content from message where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteOneMessage" parameterType="int">
+  	delete from message where id = #{_parameter}
+  </delete>
+  
+  <delete id="deleteBatch" parameterType="java.util.List">
+  	delete from message where id in(
+  		<foreach collection="list" item="item" separator=",">
+  			#{item}
+  		</foreach>
+  	)
+  </delete>
+  
+  <insert id="insert" parameterType="com.wl.domain.Message" >
+    insert into message (command, description, content)
+    values (#{command,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.wl.domain.Message" >
+    insert into message
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="command != null" >
+        command,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="command != null" >
+        #{command,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateOne" parameterType="com.wl.domain.Message">
+  	update message set command = #{command,jdbcType=VARCHAR},
+  	description = #{description,jdbcType=VARCHAR},
+  	content = #{content,jdbcType=VARCHAR}
+  	where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+</mapper>
